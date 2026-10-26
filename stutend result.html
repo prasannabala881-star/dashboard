@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Result Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px #00000020;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1d4ed8;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        input {
+            flex: 1;
+            min-width: 0;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 12px 18px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1e40af;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background: #1d4ed8;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f2f6fc;
+        }
+
+        .pass {
+            color: green;
+            font-weight: bold;
+        }
+
+        .fail {
+            color: red;
+            font-weight: bold;
+        }
+
+        #message {
+            text-align: center;
+            color: #dc2626;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 12px;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            th, td {
+                padding: 8px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Student Result Dashboard</h1>
+
+    <div class="search-box">
+        <input type="text" id="searchInput"
+               placeholder="Search by student name or roll number">
+
+        <button onclick="searchStudent()">Search</button>
+        <button onclick="displayStudents()">Show All</button>
+    </div>
+
+    <p id="message" aria-live="polite"></p>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Roll No</th>
+                    <th>Name</th>
+                    <th>Java</th>
+                    <th>Python</th>
+                    <th>Web Design</th>
+                    <th>Total</th>
+                    <th>Average</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+
+            <tbody id="studentTable"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Student objects stored in an array
+    const students = [
+        {
+            rollNo: "101",
+            name: "Prasanna",
+            marks: [90, 85, 95]
+        },
+        {
+            rollNo: "102",
+            name: "Arun",
+            marks: [75, 80, 70]
+        },
+        {
+            rollNo: "103",
+            name: "Priya",
+            marks: [95, 92, 98]
+        },
+        {
+            rollNo: "104",
+            name: "Kumar",
+            marks: [35, 45, 30]
+        },
+        {
+            rollNo: "105",
+            name: "Divya",
+            marks: [65, 70, 80]
+        }
+    ];
+
+    // Display student records
+    function displayStudents(list = students) {
+        const table = document.getElementById("studentTable");
+        const message = document.getElementById("message");
+
+        table.innerHTML = "";
+        message.textContent = "";
+
+        if (list.length === 0) {
+            message.textContent = "No student records found!";
+            return;
+        }
+
+        list.forEach(function(student) {
+            const total = student.marks.reduce(
+                (sum, mark) => sum + mark, 0
+            );
+
+            const average = total / student.marks.length;
+
+            const result = student.marks.every(
+                mark => mark >= 40
+            ) ? "PASS" : "FAIL";
+
+            const row = document.createElement("tr");
+
+            const values = [
+                student.rollNo,
+                student.name,
+                ...student.marks,
+                total,
+                average.toFixed(2),
+                result
+            ];
+
+            values.forEach(function(value, index) {
+                const cell = document.createElement("td");
+                cell.textContent = value;
+
+                if (index === 7) {
+                    cell.className =
+                        result === "PASS" ? "pass" : "fail";
+                }
+
+                row.appendChild(cell);
+            });
+
+            table.appendChild(row);
+        });
+    }
+
+    // Search by name or roll number
+    function searchStudent() {
+        const query = document.getElementById("searchInput")
+            .value.trim().toLowerCase();
+
+        if (query === "") {
+            document.getElementById("message").textContent =
+                "Please enter a name or roll number.";
+            return;
+        }
+
+        const filteredStudents = students.filter(function(student) {
+            return student.name.toLowerCase().includes(query) ||
+                   student.rollNo.toLowerCase().includes(query);
+        });
+
+        displayStudents(filteredStudents);
+    }
+
+    // Show all students when Enter is pressed
+    document.getElementById("searchInput")
+        .addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                searchStudent();
+            }
+        });
+
+    // Display all records when page loads
+    displayStudents();
+</script>
+
+</body>
+</html>
